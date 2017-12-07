@@ -5,6 +5,8 @@ require 'set'
 require 'uri'
 
 class Blockchain
+  attr_reader :chain, :nodes
+
   def initialize
     @chain = []
     @current_transactions = []
@@ -15,7 +17,7 @@ class Blockchain
 
   def register_node(address)
     uri = URI.parse(address)
-    @nodes.add(uri.host)
+    @nodes.add(uri.to_s)
   end
 
   def valid_chain?(chain)
