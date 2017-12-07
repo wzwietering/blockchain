@@ -2,12 +2,11 @@
 This project contains a simple blockchain with an API
 
 ## Setup
-Install ruby and the bundler gem
-Run 'bundle'
+Install ruby and the bundler gem. Run `bundle`.
 
 ## Usage
-Enter `ruby app.rb` in your favorite terminal to start the server
-The can be accessed via localhost:4567
+Enter `ruby app.rb` in your favorite terminal to start the server.
+The application can be accessed via localhost:4567.
 The server can do the following requests:
 * `GET /mine` mines the current block
 * `GET /chain` returns the full chain in JSON
