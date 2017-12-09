@@ -38,7 +38,7 @@ post '/transactions/new' do
     return
   end
 
-  index = blockchain.new_transaction(values[:sender], values[:recipient], values[:amount])
+  index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
   response = {:message => "Transaction will be added to Block #{index}"}
 
   content_type :json
@@ -95,6 +95,16 @@ get '/nodes/resolve' do
     }
   end
 
+  content_type :json
+  status 200
+  response.to_json
+end
+
+get '/load' do
+  blockchain.load
+  response = {
+    :message => 'Blockchain loaded'
+  }
   content_type :json
   status 200
   response.to_json

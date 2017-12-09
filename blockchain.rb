@@ -83,7 +83,7 @@ class Blockchain
   def new_block(proof, previous_hash=nil)
     block = {
       :index => @chain.length + 1,
-      :timestamp => Time.now.utc,
+      :timestamp => Time.now.utc.to_i,
       :transactions => @current_transactions,
       :proof => proof,
       :previous_hash => (previous_hash or self.class.hash(@chain[-1])),
@@ -93,12 +93,13 @@ class Blockchain
     @current_transactions = []
 
     @chain.push(block)
+    save
     return block
   end
 
   def new_transaction(sender, recipient, amount)
     @current_transactions.push({
-      :index => sender,
+      :sender => sender,
       :recipient => recipient,
       :amount => amount,
     })
@@ -128,5 +129,17 @@ class Blockchain
 
   def last_block
     return @chain[-1]
+  end
+
+  def save
+    json = {:chain => @chain}.to_json
+    File.open("blockchain.json","w") do |f|
+      f.write(json)
+    end 
+  end
+
+  def load
+    file = File.read "blockchain.json"
+    @chain = JSON.parse(file, :symbolize_names => true)[:chain]
   end
 end
