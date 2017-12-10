@@ -8,14 +8,9 @@ blockchain = Blockchain.new
 node_identifier = SecureRandom.uuid
 
 get '/mine' do
-  # Get the next proof
-  last_block = blockchain.last_block
-  last_proof = last_block[:proof]
-  proof = blockchain.proof_of_work(last_proof)
-
   blockchain.new_transaction(0, node_identifier, 1)
 
-  block = blockchain.new_block(proof)
+  block = blockchain.new_block
 
   response = {
     :message => "New Block Forged",
@@ -106,12 +101,14 @@ get '/load' do
     response = {
       :message => 'blockchain.json does not exist'
     }
+    content_type :json
     return response.to_json
   elsif not File.exists?("data/pending_transactions.json")
     status 404
     response = {
       :message => 'pending_transactions.json does not exist'
     }
+    content_type :json
     return response.to_json
   else
     blockchain.load

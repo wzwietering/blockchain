@@ -12,7 +12,7 @@ class Blockchain
     @current_transactions = []
     @nodes = Set.new
 
-    self.new_block(100, 1)
+    self.new_block(1)
   end
 
   def register_node(address)
@@ -33,7 +33,7 @@ class Blockchain
       if block[:previous_hash] != self.class.hash(last_block)
         return false
       end
-      if not self.class.valid_proof?(last_block[:proof], block[:proof])
+      if not self.class.valid_proof?(block, block[:proof])
         return false
       end
 
@@ -80,14 +80,16 @@ class Blockchain
     return false
   end
 
-  def new_block(proof, previous_hash=nil)
+  def new_block(previous_hash=nil)
     block = {
       :index => @chain.length + 1,
       :timestamp => Time.now.utc.to_i,
       :transactions => @current_transactions,
-      :proof => proof,
       :previous_hash => (previous_hash or self.class.hash(@chain[-1])),
     }
+
+    proof = proof_of_work(block)
+    block[:proof] = proof
 
     # Reset the current list of transactions
     @current_transactions = []
@@ -114,18 +116,18 @@ class Blockchain
     return Digest::SHA256.hexdigest(block_string)
   end
 
-  def proof_of_work(last_proof)
+  def proof_of_work(block)
     proof = 0
-    while self.class.valid_proof?(last_proof, proof) == false
+    while self.class.valid_proof?(block, proof) == false
       proof += 1
     end
 
     return proof
   end
 
-  def self.valid_proof?(last_proof, proof)
-    guess = "#{last_proof}#{proof}".encode('utf-8')
-    guess_hash = Digest::SHA256.hexdigest(guess)
+  def self.valid_proof?(block, proof)
+    block[:proof] = proof 
+    guess_hash = hash(block)
     return guess_hash[0...4] == "0000"
   end
 
