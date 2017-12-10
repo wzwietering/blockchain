@@ -10,6 +10,7 @@ The application can be accessed via localhost:4567.
 The server can do the following requests:
 * `GET /mine` mines the current block
 * `GET /chain` returns the full chain in JSON
+* `GET /chain/valid` tells you whether the current chain is valid
 * `GET /load` loads the previous used blockchain
 * `GET /transactions/current` show the transactions which are not yet placed in a block
 * `POST /transactions/new` to create a new transaction. The format is:

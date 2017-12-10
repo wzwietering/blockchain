@@ -50,6 +50,17 @@ get '/chain' do
   }
 
   content_type :json
+  status 200
+  response.to_json
+end
+
+get '/chain/valid' do
+  valid = blockchain.valid_chain?(blockchain.chain)
+  response = {
+    :message => valid
+  }
+  content_type :json
+  status 200
   response.to_json
 end
 

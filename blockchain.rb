@@ -26,9 +26,6 @@ class Blockchain
 
     while current_index < chain.length
       block = chain[current_index]
-      puts "#{last_block}"
-      puts "#{block}"
-      puts "\n-----------\n"
 
       if block[:previous_hash] != self.class.hash(last_block)
         return false
