@@ -101,11 +101,25 @@ get '/nodes/resolve' do
 end
 
 get '/load' do
-  blockchain.load
-  response = {
-    :message => 'Blockchain loaded'
-  }
-  content_type :json
-  status 200
-  response.to_json
+  if not File.exists?("data/blockchain.json")
+    status 404
+    response = {
+      :message => 'blockchain.json does not exist'
+    }
+    return response.to_json
+  elsif not File.exists?("data/pending_transactions.json")
+    status 404
+    response = {
+      :message => 'pending_transactions.json does not exist'
+    }
+    return response.to_json
+  else
+    blockchain.load
+    response = {
+      :message => 'Blockchain loaded'
+    }
+    content_type :json
+    status 200
+    response.to_json
+  end
 end

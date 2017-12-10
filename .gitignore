@@ -50,8 +50,7 @@ build-iPhoneSimulator/
 .rvmrc
 
 # Ignore the saved blockchain
-blockchain.json
-pending_transactions.json
+/data/
 
 # Ignore VIM
 *.swp

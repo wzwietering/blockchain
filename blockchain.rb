@@ -135,21 +135,23 @@ class Blockchain
 
   def save
     json = @chain.to_json
-    File.open("blockchain.json","w") do |f|
+    FileUtils.mkdir_p("data") unless Dir.exists?("data")
+    File.open("data/blockchain.json","w") do |f|
       f.write(json)
     end 
   end
 
   def save_transactions
-    File.open("pending_transactions.json","w") do |f|
+    FileUtils.mkdir_p("data") unless Dir.exists?("data")
+    File.open("data/pending_transactions.json","w") do |f|
       f.write(@current_transactions.to_json)
     end
   end  
 
   def load
-    file = File.read "blockchain.json"
+    file = File.read "data/blockchain.json"
     @chain = JSON.parse(file, :symbolize_names => true)
-    file = File.read "pending_transactions.json"
+    file = File.read "data/pending_transactions.json"
     @current_transactions = JSON.parse(file, :symbolize_names => true)
   end
 end
