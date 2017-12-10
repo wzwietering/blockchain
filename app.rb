@@ -34,7 +34,7 @@ post '/transactions/new' do
   end
 
   index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
-  response = {:message => "Transaction will be added to Block #{index}"}
+  response = {:message => "Transaction will be added to block #{index}"}
 
   content_type :json
   response.to_json
@@ -47,6 +47,15 @@ get '/chain' do
     :length => chain.length
   }
 
+  content_type :json
+  response.to_json
+end
+
+get '/transactions/current' do
+  response = {
+    :transactions => blockchain.current_transactions
+  }
+  status 200
   content_type :json
   response.to_json
 end

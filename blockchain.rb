@@ -5,7 +5,7 @@ require 'set'
 require 'uri'
 
 class Blockchain
-  attr_reader :chain, :nodes
+  attr_reader :chain, :nodes, :current_transactions
 
   def initialize
     @chain = []
