@@ -51,3 +51,7 @@ build-iPhoneSimulator/
 
 # Ignore the saved blockchain
 blockchain.json
+pending_transactions.json
+
+# Ignore VIM
+*.swp

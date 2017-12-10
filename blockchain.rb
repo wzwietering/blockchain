@@ -104,6 +104,8 @@ class Blockchain
       :amount => amount,
     })
 
+    save_transactions
+
     return last_block[:index] + 1
   end
 
@@ -132,14 +134,22 @@ class Blockchain
   end
 
   def save
-    json = {:chain => @chain}.to_json
+    json = @chain.to_json
     File.open("blockchain.json","w") do |f|
       f.write(json)
     end 
   end
 
+  def save_transactions
+    File.open("pending_transactions.json","w") do |f|
+      f.write(@current_transactions.to_json)
+    end
+  end  
+
   def load
     file = File.read "blockchain.json"
-    @chain = JSON.parse(file, :symbolize_names => true)[:chain]
+    @chain = JSON.parse(file, :symbolize_names => true)
+    file = File.read "pending_transactions.json"
+    @current_transactions = JSON.parse(file, :symbolize_names => true)
   end
 end
