@@ -150,10 +150,18 @@ class Blockchain
     end
   end  
 
-  def load
-    file = File.read "data/blockchain.json"
-    @chain = JSON.parse(file, :symbolize_names => true)
-    file = File.read "data/pending_transactions.json"
-    @current_transactions = JSON.parse(file, :symbolize_names => true)
+  # Returns if the load is succesful
+  def load?
+    if not File.exists?("data/blockchain.json")
+      return false
+    elsif not File.exists?("data/pending_transactions.json")
+      return false
+    else
+      file = File.read "data/blockchain.json"
+      @chain = JSON.parse(file, :symbolize_names => true)
+      file = File.read "data/pending_transactions.json"
+      @current_transactions = JSON.parse(file, :symbolize_names => true)
+      return true
+    end
   end
 end

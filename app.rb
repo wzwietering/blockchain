@@ -21,6 +21,7 @@ get '/mine' do
   }
 
   content_type :json
+  status 201
   response.to_json
 end
 
@@ -37,6 +38,7 @@ post '/transactions/new' do
   response = {:message => "Transaction will be added to block #{index}"}
 
   content_type :json
+  status 201
   response.to_json
 end
 
@@ -105,27 +107,19 @@ get '/nodes/resolve' do
 end
 
 get '/load' do
-  if not File.exists?("data/blockchain.json")
-    status 404
-    response = {
-      :message => 'blockchain.json does not exist'
-    }
-    content_type :json
-    return response.to_json
-  elsif not File.exists?("data/pending_transactions.json")
-    status 404
-    response = {
-      :message => 'pending_transactions.json does not exist'
-    }
-    content_type :json
-    return response.to_json
-  else
-    blockchain.load
+  if blockchain.load?
     response = {
       :message => 'Blockchain loaded'
     }
     content_type :json
     status 200
+    response.to_json
+  else 
+    response = {
+      :message => 'No blockchain found'
+    }
+    content_type :json
+    status 404
     response.to_json
   end
 end
