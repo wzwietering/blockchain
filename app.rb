@@ -26,6 +26,7 @@ get '/mine' do
   response.to_json
 end
 
+# Transaction routes
 post '/transactions/new' do
   values = JSON.parse(request.body.read)
   required = ['sender', 'recipient', 'amount']
@@ -43,6 +44,16 @@ post '/transactions/new' do
   response.to_json
 end
 
+get '/transactions/current' do
+  response = {
+    :transactions => blockchain.current_transactions
+  }
+  status 200
+  content_type :json
+  response.to_json
+end
+
+# Chain routes
 get '/chain' do
   chain = blockchain.chain
   response = {
@@ -65,15 +76,54 @@ get '/chain/valid' do
   response.to_json
 end
 
-get '/transactions/current' do
-  response = {
-    :transactions => blockchain.current_transactions
-  }
-  status 200
+post '/chain/index' do
+  values = JSON.parse(request.body.read, :symbolize_names => true)
+  required = [:index]
+  if not required.all? {|s| values.key? s}
+    status 400
+    body "Missing values: " + (required - values.keys).join(",")
+    return
+  end
+  if values[:index] > blockchain.chain.length
+    status 404
+    return body "Index is higher than chain length"
+  end
+  response = blockchain.chain[values[:index]]
   content_type :json
+  status 200
   response.to_json
 end
 
+post '/chain/range' do
+  values = JSON.parse(request.body.read, :symbolize_names => true)
+  required = [:from]
+  if not required.all? {|s| values.key? s}
+    status 400
+    body "Missing values: " + (required - values.keys).join(",")
+    return
+  end
+
+  if values[:from] > blockchain.chain.length
+    status 400
+    return body "From is higher than chain length"
+  end
+
+  if values.key?(:to)
+    if values[:to] > blockchain.chain.length
+      status 400
+      return body "To is higher than chain length"
+    else
+      response = blockchain.chain[values[:from]..values[:to]]
+    end
+  else
+    response = blockchain.chain.slice(values[:from], blockchain.chain.length - values[:from])
+  end
+  content_type :json
+  status 200
+  response.to_json
+end
+
+# Node routes
 post '/nodes/register' do
   values = JSON.parse(request.body.read)
   nodes = values["nodes"]
@@ -134,4 +184,21 @@ get '/load' do
     status 404
     response.to_json
   end
+end
+
+post '/block/valid' do
+  values = JSON.parse(request.body.read, :symbolize_names => true)
+  required = [:index, :timestamp, :transactions, :previous_hash, :merkle_root, :proof]
+  if not required.all? {|s| values.key? s}
+    status 400
+    body "Missing values: " + (required - values.keys).join(",")
+    return
+  end
+  valid = blockchain.class.valid_block?(values)
+  response = {
+    :message => valid
+  }
+  content_type :json
+  status 200
+  response.to_json
 end

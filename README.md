@@ -11,6 +11,19 @@ The server can do the following requests:
 * `GET /mine` mines the current block
 * `GET /chain` returns the full chain in JSON
 * `GET /chain/valid` tells you whether the current chain is valid
+* `POST /chain/index` to get the block on a certain index. The format is:
+```json
+{
+  "index": 1
+}
+```
+* `POST /chain/range` to get a range of blocks. When you omit the 'to' parameter you will get the chain to the end. The format is:
+```json
+{
+  "from": 1,
+  (optional) "to": 4
+}
+```
 * `GET /load` loads the previous used blockchain
 * `GET /transactions/current` show the transactions which are not yet placed in a block
 * `POST /transactions/new` to create a new transaction. The format is:
@@ -19,6 +32,23 @@ The server can do the following requests:
   "sender": "your hash",
   "recipient": "the other hash",
   "amount": 123
+}
+```
+* `POST /block/valid` validates a block for you. The required format is:
+```json
+{
+  "index": 0,
+  "timestamp": 0,
+  "transactions": [
+  {
+    "sender": "0",
+    "recipient": "0",
+    "amount": 0
+  }
+  ],
+  "previous_hash": "0",
+  "merkle_root": "0",
+  "proof": 0
 }
 ```
 
