@@ -1,5 +1,5 @@
 # Blockchain
-This project contains a simple blockchain with an API and support for multiple nodes.
+This project contains a blockchain with an API and support for multiple nodes. The blockchain code has validations mechanisms to verify blocks, transactions and the entire chain. Every block hash starts with four zeros. Transactions are validated using a [Merkle Tree](https://en.wikipedia.org/wiki/Merkle_tree).
 
 ## Setup
 Install ruby and the bundler gem. Run `bundle`.
@@ -39,7 +39,7 @@ The server can do the following requests:
 {
   "index": 0,
   "timestamp": 0,
-  "transactions": []
+  "transactions": [],
   "previous_hash": "0",
   "merkle_root": "0",
   "proof": 0
@@ -56,4 +56,5 @@ For multiple nodes you can use the following requests:
 ```
 
 ## Sources
-[Bitcoin paper](https://bitcoin.org/bitcoin.pdf)
+* [Bitcoin paper](https://bitcoin.org/bitcoin.pdf)
+* [Merkle Tree](https://en.wikipedia.org/wiki/Merkle_tree)
