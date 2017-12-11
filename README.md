@@ -17,11 +17,11 @@ The server can do the following requests:
   "index": 1
 }
 ```
-* `POST /chain/range` to get a range of blocks. When you omit the 'to' parameter you will get the chain to the end. The format is:
+* `POST /chain/range` to get a range of blocks. When you omit the 'to' parameter you will get the chain to the end. The 'from' parameter is required. The format is:
 ```json
 {
   "from": 1,
-  (optional) "to": 4
+  "to": 4
 }
 ```
 * `GET /load` loads the previous used blockchain
@@ -39,13 +39,7 @@ The server can do the following requests:
 {
   "index": 0,
   "timestamp": 0,
-  "transactions": [
-  {
-    "sender": "0",
-    "recipient": "0",
-    "amount": 0
-  }
-  ],
+  "transactions": []
   "previous_hash": "0",
   "merkle_root": "0",
   "proof": 0

@@ -115,7 +115,7 @@ class Blockchain
     merkle_tree = MerkleTree.new(@current_transactions)
     merkle_root = merkle_tree.root.hash
     block = {
-      :index => @chain.length + 1,
+      :index => @chain.length,
       :timestamp => Time.now.utc.to_i,
       :transactions => @current_transactions,
       :previous_hash => (previous_hash or self.class.hash(last_block)),
