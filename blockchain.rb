@@ -44,10 +44,17 @@ class Blockchain
     while current_index < chain.length
       block = chain[current_index]
 
+      # Validate relations and chronological order
       if block[:previous_hash] != self.class.hash(last_block)
         return false
+      elsif block[:timestamp] < last_block[:timestamp]
+        return false
+      elsif block[:index] < last_block[:index]
+        return false
       end
-      if not self.class.valid_proof?(block, block[:proof])
+      
+      # Validate block
+      if not self.class.valid_block?(block)
         return false
       end
 
@@ -56,6 +63,16 @@ class Blockchain
     end
 
     return true
+  end
+
+  def self.valid_block?(block)
+    if not self.valid_proof?(block, block[:proof])
+      return false
+    elsif not MerkleTree.valid_hash?(block[:merkle_root], block[:transactions])
+      return false
+    else
+      return true
+    end
   end
 
   def resolve_conflicts?
