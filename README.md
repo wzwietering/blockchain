@@ -30,3 +30,6 @@ For multiple nodes you can use the following requests:
   "nodes": ["An ip adress or website"]
 }
 ```
+
+## Sources
+[Bitcoin paper](https://bitcoin.org/bitcoin.pdf)

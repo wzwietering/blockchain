@@ -4,6 +4,8 @@ require 'net/http'
 require 'set'
 require 'uri'
 
+require_relative 'merkletree/merkletree'
+
 class Blockchain
   attr_reader :chain, :nodes, :current_transactions
 
@@ -12,7 +14,22 @@ class Blockchain
     @current_transactions = []
     @nodes = Set.new
 
-    self.new_block(1)
+    chain.push(genesis_block)
+  end
+
+  def genesis_block
+    transactions = [{:sender => 0, :recipient => 0, :amount => 0}]
+    merkle_root = MerkleTree.new(transactions).root.hash
+    block = {
+      :index => 0,
+      :timestamp => 0,
+      :transactions => transactions,
+      :previous_hash => '6f785a86b2716dcc5a48caa0de944396ba871d5c7f3bf776993648335fcb2bb2',
+      :merkle_root => merkle_root
+    }
+    proof = proof_of_work(block)
+    block[:proof] = proof 
+    return block
   end
 
   def register_node(address)
@@ -78,11 +95,14 @@ class Blockchain
   end
 
   def new_block(previous_hash=nil)
+    merkle_tree = MerkleTree.new(@current_transactions)
+    merkle_root = merkle_tree.root.hash
     block = {
       :index => @chain.length + 1,
       :timestamp => Time.now.utc.to_i,
       :transactions => @current_transactions,
-      :previous_hash => (previous_hash or self.class.hash(@chain[-1])),
+      :previous_hash => (previous_hash or self.class.hash(last_block)),
+      :merkle_root => merkle_root
     }
 
     proof = proof_of_work(block)

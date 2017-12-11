@@ -18,6 +18,7 @@ get '/mine' do
     :transactions => block[:transactions],
     :proof => block[:proof],
     :previous_hash => block[:previous_hash],
+    :merkle_root => block[:merkle_root]
   }
 
   content_type :json
