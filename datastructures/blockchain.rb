@@ -28,7 +28,7 @@ class Blockchain
       :merkle_root => merkle_root
     }
     proof = proof_of_work(block)
-    block[:proof] = proof 
+    block[:proof] = proof
     return block
   end
 
@@ -46,13 +46,16 @@ class Blockchain
 
       # Validate relations and chronological order
       if block[:previous_hash] != self.class.hash(last_block)
+        puts "Invalid hash of previous block on block #{block[:index]}"
         return false
       elsif block[:timestamp] < last_block[:timestamp]
+        puts "Invalid block order based on time on block #{block[:index]}"
         return false
       elsif block[:index] < last_block[:index]
+        puts "Invalid block order based on index on block #{block[:index]}"
         return false
       end
-      
+
       # Validate block
       if not self.class.valid_block?(block)
         return false
@@ -67,8 +70,10 @@ class Blockchain
 
   def self.valid_block?(block)
     if not self.valid_proof?(block, block[:proof])
+      puts "Invalid proof on block #{block[:index]}"
       return false
     elsif not MerkleTree.valid_hash?(block[:merkle_root], block[:transactions])
+      puts "Invalid merkleroot on block #{block[:index]}"
       return false
     else
       return true
@@ -112,6 +117,7 @@ class Blockchain
   end
 
   def new_block(previous_hash=nil)
+    start = Time.now
     merkle_tree = MerkleTree.new(@current_transactions)
     merkle_root = merkle_tree.root.hash
     block = {
@@ -130,6 +136,7 @@ class Blockchain
 
     @chain.push(block)
     save
+    puts 'Block created in: ' + (Time.now - start).to_s + ' seconds'
     return block
   end
 
@@ -152,15 +159,17 @@ class Blockchain
 
   def proof_of_work(block)
     proof = 0
+    start = Time.now
     while self.class.valid_proof?(block, proof) == false
       proof += 1
     end
+    puts 'Proof found in: ' + (Time.now - start).to_s
 
     return proof
   end
 
   def self.valid_proof?(block, proof)
-    block[:proof] = proof 
+    block[:proof] = proof
     guess_hash = hash(block)
     return guess_hash[0...4] == "0000"
   end
@@ -174,7 +183,7 @@ class Blockchain
     FileUtils.mkdir_p("data") unless Dir.exists?("data")
     File.open("data/blockchain.json","w") do |f|
       f.write(json)
-    end 
+    end
   end
 
   def save_transactions
@@ -182,7 +191,7 @@ class Blockchain
     File.open("data/pending_transactions.json","w") do |f|
       f.write(@current_transactions.to_json)
     end
-  end  
+  end
 
   # Returns if the load is succesful
   def load?
