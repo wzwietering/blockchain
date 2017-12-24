@@ -2,7 +2,7 @@ require 'sinatra'
 require 'securerandom'
 require 'json'
 
-require_relative 'blockchain'
+require_relative 'datastructures/blockchain'
 
 blockchain = Blockchain.new
 node_identifier = SecureRandom.uuid
