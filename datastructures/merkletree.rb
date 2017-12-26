@@ -10,18 +10,23 @@ class MerkleTree
     @root = self.class.create_tree(leafs)
   end
 
+  # Create a merkle tree
   def self.create_tree(nodes)
     if nodes.length < 1
       raise ArgumentError.new("Nodes are required for a valid merkletree")
     elsif nodes.length == 1
+      # One node means we reached the root
       return nodes[0]
     else
       parents = []
+      # Every pair of nodes should be merged to a new node
       (0...nodes.length).step(2).each do |x|
+        # In case of uneven nodes, the right node can be nonexistant
         right = (x + 1 > nodes.length) ? nil : nodes[x + 1]
         parent = Node.new(nodes[x], right)
         parents.push(parent)
       end
+      # Move one layer up in the tree
       create_tree(parents)
     end
   end

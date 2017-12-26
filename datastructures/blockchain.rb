@@ -9,14 +9,17 @@ require_relative 'merkletree'
 class Blockchain
   attr_reader :chain, :nodes, :current_transactions
 
+  # Setup the blockchain
   def initialize
     @chain = []
     @current_transactions = []
     @nodes = Set.new
-
+    
+    # Add first block
     chain.push(genesis_block)
   end
 
+  # Special, empty block
   def genesis_block
     transactions = [{:sender => 0, :recipient => 0, :amount => 0}]
     merkle_root = MerkleTree.new(transactions).root.hash
@@ -32,11 +35,13 @@ class Blockchain
     return block
   end
 
+  # Add a new node to the network
   def register_node(address)
     uri = URI.parse(address)
     @nodes.add(uri.to_s)
   end
 
+  # Validate a blockchain
   def valid_chain?(chain)
     last_block = chain[0]
     current_index = 1
@@ -68,10 +73,13 @@ class Blockchain
     return true
   end
 
+  # Validate a block
   def self.valid_block?(block)
+    # Validate proof
     if not self.valid_proof?(block, block[:proof])
       puts "Invalid proof on block #{block[:index]}"
       return false
+    # Validate merkletree
     elsif not MerkleTree.valid_hash?(block[:merkle_root], block[:transactions])
       puts "Invalid merkleroot on block #{block[:index]}"
       return false
@@ -80,11 +88,10 @@ class Blockchain
     end
   end
 
+  # Resolve conflicts between nodes
   def resolve_conflicts?
     neighbours = @nodes
     new_chain = nil
-
-    # Only look for long chains
     max_length = @chain.length
 
     # Grab and verify the chains from all the nodes in our network
@@ -116,8 +123,9 @@ class Blockchain
     return false
   end
 
+  # Add a block to the chain. The hash is optional, this method will calculate it when it is nil
   def new_block(previous_hash=nil)
-    start = Time.now
+    start = Time.now.utc
     merkle_tree = MerkleTree.new(@current_transactions)
     merkle_root = merkle_tree.root.hash
     block = {
@@ -134,12 +142,14 @@ class Blockchain
     # Reset the current list of transactions
     @current_transactions = []
 
+    # Add the block to the chain and save it
     @chain.push(block)
     save
     puts 'Block created in: ' + (Time.now - start).to_s + ' seconds'
     return block
   end
 
+  # Create a transaction
   def new_transaction(sender, recipient, amount)
     @current_transactions.push({
       :sender => sender,
@@ -152,11 +162,13 @@ class Blockchain
     return last_block[:index] + 1
   end
 
+  # Hash a block as JSON
   def self.hash(block)
     block_string = JSON.dump(block).encode('utf-8')
     return Digest::SHA256.hexdigest(block_string)
   end
 
+  # Create a proof for a block
   def proof_of_work(block)
     proof = 0
     start = Time.now
@@ -168,6 +180,7 @@ class Blockchain
     return proof
   end
 
+  # Validate a proof
   def self.valid_proof?(block, proof)
     block[:proof] = proof
     guess_hash = hash(block)
@@ -178,6 +191,7 @@ class Blockchain
     return @chain[-1]
   end
 
+  # Save the blockchain as a JSON file
   def save
     json = @chain.to_json
     FileUtils.mkdir_p("data") unless Dir.exists?("data")
@@ -186,6 +200,7 @@ class Blockchain
     end
   end
 
+  # Save the current transactions as a JSON file
   def save_transactions
     FileUtils.mkdir_p("data") unless Dir.exists?("data")
     File.open("data/pending_transactions.json","w") do |f|

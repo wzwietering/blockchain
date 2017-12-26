@@ -4,9 +4,11 @@ require 'json'
 
 require_relative 'datastructures/blockchain'
 
+# First we make a new blockchain and we create an id to be identified
 blockchain = Blockchain.new
 node_identifier = SecureRandom.uuid
 
+# Mining is the process of freeze the transactions in a block and finding a proof
 get '/mine' do
   blockchain.new_transaction(0, node_identifier, 1)
 
@@ -27,6 +29,8 @@ get '/mine' do
 end
 
 # Transaction routes
+#
+# Add a transaction. A sender, recipient and an amount are required
 post '/transactions/new' do
   values = JSON.parse(request.body.read)
   required = ['sender', 'recipient', 'amount']
@@ -44,6 +48,7 @@ post '/transactions/new' do
   response.to_json
 end
 
+# Return the transactions which are not mined yet
 get '/transactions/current' do
   response = {
     :transactions => blockchain.current_transactions
@@ -54,6 +59,8 @@ get '/transactions/current' do
 end
 
 # Chain routes
+#
+# Return the full chain
 get '/chain' do
   chain = blockchain.chain
   response = {
@@ -66,6 +73,7 @@ get '/chain' do
   response.to_json
 end
 
+# Force a revalidation of the chain by recalculating every hash
 get '/chain/valid' do
   valid = blockchain.valid_chain?(blockchain.chain)
   response = {
@@ -76,6 +84,7 @@ get '/chain/valid' do
   response.to_json
 end
 
+# The a certain block in the chain
 post '/chain/index' do
   values = JSON.parse(request.body.read, :symbolize_names => true)
   required = [:index]
@@ -94,6 +103,7 @@ post '/chain/index' do
   response.to_json
 end
 
+# Get a range of blocks in the chain
 post '/chain/range' do
   values = JSON.parse(request.body.read, :symbolize_names => true)
   required = [:from]
@@ -124,6 +134,8 @@ post '/chain/range' do
 end
 
 # Node routes
+#
+# Register a new node
 post '/nodes/register' do
   values = JSON.parse(request.body.read)
   nodes = values["nodes"]
@@ -148,6 +160,7 @@ post '/nodes/register' do
   response.to_json
 end
 
+# Resolve conflicts between nodes
 get '/nodes/resolve' do
   replaced = blockchain.resolve_conflicts?
 
@@ -168,6 +181,7 @@ get '/nodes/resolve' do
   response.to_json
 end
 
+# Load the saved blockchain
 get '/load' do
   if blockchain.load?
     response = {
@@ -186,6 +200,7 @@ get '/load' do
   end
 end
 
+# Validate a block by sending it to this node
 post '/block/valid' do
   values = JSON.parse(request.body.read, :symbolize_names => true)
   required = [:index, :timestamp, :transactions, :previous_hash, :merkle_root, :proof]
