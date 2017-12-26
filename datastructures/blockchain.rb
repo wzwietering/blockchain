@@ -4,7 +4,7 @@ require 'net/http'
 require 'set'
 require 'uri'
 
-require_relative 'merkletree/merkletree'
+require_relative 'merkletree'
 
 class Blockchain
   attr_reader :chain, :nodes, :current_transactions
@@ -24,7 +24,7 @@ class Blockchain
       :index => 0,
       :timestamp => 0,
       :transactions => transactions,
-      :previous_hash => '6f785a86b2716dcc5a48caa0de944396ba871d5c7f3bf776993648335fcb2bb2',
+      :previous_hash => '0',
       :merkle_root => merkle_root
     }
     proof = proof_of_work(block)
